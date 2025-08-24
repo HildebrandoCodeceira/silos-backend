@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Silos Backend (Node.js + Express + MongoDB)
 
 Backend completo para o sistema de **Monitoramento de Silos Agrícolas**.
@@ -58,3 +59,6 @@ npm run simulate
 - Os limiares de alerta podem ser ajustados via `.env` ou por silo.
 - Estrutura preparada para futura integração com MQTT/LoRaWAN.
 - Data de geração: 2025-08-22
+=======
+# silos-backend
+>>>>>>> 9fae78c7239e8456ded617ce888aaafa9f52cd3f
