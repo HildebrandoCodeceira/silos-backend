@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 import User from '../src/models/User.js';
 
 dotenv.config();
 
 const MONGO_URI = process.env.MONGO_URI;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '123456';
 
 if (!MONGO_URI) {
   console.error("❌ MONGO_URI não encontrada no .env");
@@ -13,28 +15,36 @@ if (!MONGO_URI) {
 
 const seedAdmin = async () => {
   try {
-    await mongoose.connect(MONGO_URI, { 
-      useNewUrlParser: true, 
-      useUnifiedTopology: true 
+    await mongoose.connect(MONGO_URI);
+
+    const adminExists = await User.findOne({
+      $or: [
+        { email: 'admin@silos.com' },
+        { username: 'admin' }
+      ]
     });
 
-    const adminExists = await User.findOne({ email: 'admin@silos.com' });
     if (adminExists) {
       console.log("⚠️ Admin já existe.");
+      console.log(`Email: ${adminExists.email}`);
     } else {
+      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+
       await User.create({
         name: 'Administrador',
         email: 'admin@silos.com',
-        password: '123456',
-        role: 'admin'
+        password: hashedPassword,
+        role: 'admin',
+        username: 'admin'
       });
+
       console.log("✅ Admin criado com sucesso!");
     }
-
-    mongoose.connection.close();
   } catch (error) {
-    console.error("❌ Erro ao conectar no MongoDB:", error.message);
+    console.error("❌ Erro ao conectar/criar admin:", error);
     process.exit(1);
+  } finally {
+    await mongoose.connection.close();
   }
 };
 
